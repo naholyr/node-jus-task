@@ -1,5 +1,8 @@
 // TODO
 
+exports.Task = require('./task');
+
+/*
 require('./task');
 
 function getTasks(dirs) {
@@ -146,3 +149,4 @@ module.exports = {
   "list": list,
   "run":  run
 };
+*/

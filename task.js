@@ -1,3 +1,5 @@
+var cli = require('./cli');
+
 var Task = function(options) {
   extend(this, extend({
     "namespace":        null,
@@ -31,6 +33,8 @@ Task.prototype = {
   get options()                 { return Object.keys(this._options || {}); },
   "getOption": function(name)   { return this._options[name]; },
   "addOption": function(opt)    { if (!(opt instanceof Option)) opt = new Option(opt); if (typeof this._options == 'undefined') this._options = {}; this._options[opt.name] = opt; if (opt.shortName) for (var o in this._options) if (o != opt.name && o.shortName == opt.shortName) throw new Error('Duplicate short name "' + opt.shortName + '" with "' + opt.name + '" and "' + this._options[o].name + '"'); },
+  "debug": function(message)    { console.log(cli.colorize('DEBUG', 'cyan'), message); },
+  "error": function(message)    { console.log(cli.colorize('ERROR', 'red'), message); },
 };
 
 var Argument = function(options) {
