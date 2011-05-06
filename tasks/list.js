@@ -14,7 +14,9 @@ module.exports = new tasks.Task({
       var section = [];
       for (var key in list[ns]) {
         var task = list[ns][key];
-        section.push([':' + task.name, null, task.shortDescription || 'No description available', task.aliases]);
+        var aliases = task.aliases;
+        if (aliases instanceof Array && aliases.length == 0) aliases = null;
+        section.push([':' + task.name, null, task.shortDescription || 'No description available', aliases]);
       }
       sections[ns] = section;
     }

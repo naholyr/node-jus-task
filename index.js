@@ -10,6 +10,7 @@ var list = exports.list = function list(dirs) {
   if (typeof dirs == 'undefined') dirs = defaultDirs;
   var allTasks = {};
   function getPathTasks(dir) {
+    if (!helper.exists(dir)) return false;
     dir = fs.realpathSync(dir);
     fs.readdirSync(dir).forEach(function(file) {
       var fileName = path.join(dir, file);
