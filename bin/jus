@@ -7,6 +7,8 @@ const path = require('path');
 const VERSION = '1.0.0';
 const APP = path.basename(__filename);
 
+const DEBUG = process.env.NODE_DEBUG && process.env.NODE_DEBUG.match(/(true|yes|1)/i);
+
 if (process.argv.indexOf('--help') != -1) {
   showHelp();
 } else if (process.argv.indexOf('--version') != -1) {
@@ -16,12 +18,18 @@ if (process.argv.indexOf('--help') != -1) {
 if (process.argv.indexOf('--no-color') != -1) {
   helper.noColor = true;
 }
+if (DEBUG) {
+  helper.debugMode = true;
+}
 
 try {
   main();
 } catch (err) {
   helper.logError(err);
-throw err;
+  if (DEBUG) {
+    console.log('\n' + helper.formatTitle('Stack trace (debug):'));
+    throw err;
+  }
   process.exit(1);
 }
 
