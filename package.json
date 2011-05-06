@@ -13,7 +13,8 @@
   "engines": {
     "node": "*"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {},
   "bin": {
     "jus": "./bin/jus"
