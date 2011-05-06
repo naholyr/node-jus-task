@@ -2,9 +2,11 @@
   "author": "Nicolas Chambrier <naholyr@gmail.com> (http://naholyr.fr)",
   "name": "jus-task",
   "description": "Easy namespaced task handling in CLI",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "homepage": "https://github.com/naholyr/node-jus-task",
   "repository": {
-    "url": ""
+    "type": "git",
+    "url": "git://github.com/naholyr/node-jus-task.git"
   },
   "main": "index.js",
   "scripts": {
