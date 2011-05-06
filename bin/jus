@@ -21,6 +21,7 @@ try {
   main();
 } catch (err) {
   helper.logError(err);
+throw err;
   process.exit(1);
 }
 
@@ -94,15 +95,14 @@ function parseOptValue(v) {
 
 function showHelp() {
   var help = ''
-    + helper.colorize('Usage:', 'yellow') + '\n'
+    + helper.formatTitle('Usage') + '\n'
     + '  ' + APP + ' [OPTIONS] [Task] [ARGUMENTS]\n'
     + '\n'
-    + helper.colorize('Options:', 'yellow') + '\n'
-    + helper.getOptionsHelp([
+    + helper.getOptionsHelp({"Options:": [
         ['--help', null, 'Show this help and exit'],
         ['--version', null, 'Show version and exit'],
         ['--no-color', null, 'Disable ANSI color']
-      ])
+      ]})
     + '\n'
     + helper.colorize('Available tasks:', 'yellow') + '\n'
     + '  Call "' + APP + ' list"\n';

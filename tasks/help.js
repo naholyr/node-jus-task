@@ -29,14 +29,14 @@ function showHelp(task) {
   });
   var help = '';
   if (task.shortDescription) help += task.shortDescription + '\n\n';
-  help += tasks.helper.colorize('Usage:', 'yellow') + '\n'
+  help += tasks.helper.formatTitle('Usage') + '\n'
     + '  jus ' + task.fullName + ' ' + getOptionsUsage(task) + '\n\n'
-    + tasks.helper.colorize('Arguments:', 'yellow') + '\n'
-    + tasks.helper.getOptionsHelp(argsForHelp) + '\n'
-    + tasks.helper.colorize('Options:', 'yellow') + '\n'
-    + tasks.helper.getOptionsHelp(optsForHelp) + '\n';
+    + tasks.helper.getOptionsHelp({
+        "Arguments:": argsForHelp,
+        "Options:":   optsForHelp,
+      })
   if (task.description) {
-    help += tasks.helper.colorize('Description:', 'yellow') + '\n'
+    help += tasks.helper.formatTitle('Description') + '\n'
       + '  ' + task.description.split('\n').join('\n  ') + '\n';
   }
   console.log(help);
