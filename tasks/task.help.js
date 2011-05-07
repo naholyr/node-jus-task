@@ -18,14 +18,14 @@ function showHelp(task) {
   var argsForHelp = [];
   task.arguments.forEach(function(arg) {
     arg = task.getArgument(arg);
-    argsForHelp.push([arg.name, null, arg.description, arg.default ? ('default: ' + arg.default) : '', arg.mandatory]);
+    argsForHelp.push([arg.name, null, arg.description || 'No description available', arg.default ? ('default: ' + arg.default) : '', arg.mandatory]);
   });
   var optsForHelp = [];
   task.options.forEach(function(opt) {
     opt = task.getOption(opt);
     var long = opt.name ? ('--' + opt.name) : null;
     var short = opt.shortName ? ('-' + opt.shortName) : null;
-    optsForHelp.push([long, short, opt.description, opt.default ? ('default: ' + opt.default) : '', opt.mandatory]);
+    optsForHelp.push([long, short, opt.description || 'No description available', opt.default ? ('default: ' + opt.default) : '', opt.mandatory]);
   });
   var help = '';
   if (task.shortDescription) help += task.shortDescription + '\n\n';
