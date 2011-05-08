@@ -29,12 +29,12 @@ function showHelp(task) {
   });
   var help = '';
   if (task.shortDescription) help += task.shortDescription + '\n\n';
+  var optionsHelp = {};
+  if (argsForHelp.length) optionsHelp['Arguments:'] = argsForHelp;
+  if (optsForHelp.length) optionsHelp['Options:'] = optsForHelp;
   help += tasks.helper.formatTitle('Usage') + '\n'
     + '  jus ' + task.fullName + ' ' + getOptionsUsage(task) + '\n\n'
-    + tasks.helper.getOptionsHelp({
-        "Arguments:": argsForHelp,
-        "Options:":   optsForHelp,
-      })
+    + tasks.helper.getOptionsHelp(optionsHelp);
   if (task.description) {
     help += tasks.helper.formatTitle('Description') + '\n'
       + '  ' + task.description.split('\n').join('\n  ') + '\n';
