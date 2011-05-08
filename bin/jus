@@ -18,7 +18,7 @@ try {
   handleOption('--debug', "Enable debug mode", function() { helper.debugMode = true });
   handleOption('--help', "Show help for global usage", function() { showHelp() });
   handleOption('--version', "Show version", function() { showVersion() });
-  handleOption('--log-level=…', "Disable output for messages below the given log level", function(name) { if (typeof helper.level[name] == 'undefined') throw new Error('Invalid value for log level, valid values = ' + Object.keys(helper.level)); helper.logLevel = helper.level[name] });
+  handleOption('--log-level=…', "Disable output for messages below the given log level", setLogLevel);
 
   // Main usage
   tasks.runCLI(process.argv.slice(2));
@@ -62,6 +62,14 @@ function showVersion() {
   }
 }
 
+function setLogLevel(name) {
+console.log(helper.level);
+  if (typeof helper.level[name] == 'undefined') {
+    throw new Error('Invalid value for log level, valid values: ' + Object.keys(helper.level));
+  }
+  helper.logLevel = helper.level[name];
+}
+
 function removeArg(arg) {
   args = args.filter(function(a) { return a != arg });
 }
@@ -85,9 +93,11 @@ function handleOption(option, description, callback) {
     else {
       var eqPrefix = option.substring(0, option.length-1);
       for (var i=0; i<args.length; i++) {
-        if (args[i].substring(0, option.length-1) == eqPrefix) {
-          removeArg(args[i]);
-          callback(args[i].substring(eqPrefix.length-1));
+        var arg = args[i];
+        if (arg.substring(0, option.length-1) == eqPrefix) {
+          removeArg(arg);
+          callback(arg.substring(eqPrefix.length-1));
+          break;
         }
       }
     }
@@ -101,3 +111,4 @@ function handleOption(option, description, callback) {
     }
   }
 }
+
