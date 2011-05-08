@@ -50,7 +50,10 @@ Execute a task
 Create a new task
 -----------------
 
-Default behavior of `jus` is to search for tasks in a folder named "`tasks`" in current working directory.
+Jus will search for tasks as any JS file in a "tasks" folder within:
+* current folder
+* jus-task installation folder
+* any "node_modules" folder in one of those directories (recursively)
 
 Any file in this folder will be loaded as a module, that's supposed to return an instance of `Task`.
 
@@ -95,7 +98,7 @@ Check files into this folder's `tasks` subdirectory. These are the default tasks
 * `find(name)` → Instance of `Task`, name can be the full name (`hello:kitty`) or of its aliases. If task is not found, an `Error` is thrown.
 * `Task` → Class of tasks.
 
-**`Task`**
+**`tasks.Task`**
 
 * `#constructor(options)` → Available options: "namespace", "name", "execute" (callback), "description", "shortDescription", "aliases", "configure" (callback called during initialization).
 * `matchName(name)` → Returns true if given name matches task's full name or one of its aliases.
@@ -103,15 +106,15 @@ Check files into this folder's `tasks` subdirectory. These are the default tasks
 * `addArgument(options)` → Adds a new argument recognized by the task, this argument will be available in the `args` hash passed to `execute()`.
 * `execute(opts, args)` → Executes the task.
 
-**`Task.Option`**
+**`tasks.Task.Option`**
 
 TODO
 
-**`Task.Argument`**
+**`tasks.Task.Argument`**
 
 TODO
 
-**`Helper`**
+**`tasks.helper`**
 
 TODO
 
