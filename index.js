@@ -83,7 +83,7 @@ const runCLI = exports.runCLI = function(argv) {
     }
   }
   if (!task) { // No argument for a task, or we would have found a task OR thrown an exception
-    throw new Error('Arguments expected');
+    throw new Error('Task name expected');
   }
   // Parse argv and execute task
   var opts = {}, args = [];

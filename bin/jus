@@ -5,37 +5,35 @@ const tasks = require('../index');
 const path = require('path');
 const fs = require('fs');
 
-// Disable colors
-if (process.argv.indexOf('--no-color') != -1) {
-  helper.noColor = true;
+process.title = path.basename(__filename);
+
+// CLI Arguments
+var args = process.argv.slice(2);
+
+try {
+
+  // Global options
+  var globalOptions = [];
+  handleOption('--no-color', "Disable ANSI color", function() { helper.noColor = true });
+  handleOption('--debug', "Enable debug mode", function() { helper.debugMode = true });
+  handleOption('--help', "Show help for global usage", function() { showHelp() });
+  handleOption('--version', "Show version", function() { showVersion() });
+  handleOption('--log-level=…', "Disable output for messages below the given log level", function(name) { if (typeof helper.level[name] == 'undefined') throw new Error('Invalid value for log level, valid values = ' + Object.keys(helper.level)); helper.logLevel = helper.level[name] });
+
+  // Main usage
+  tasks.runCLI(process.argv.slice(2));
+
+} catch (err) {
+  showHelp(err);
 }
 
-if (process.env.NODE_DEBUG && process.env.NODE_DEBUG.match(/(true|yes|1)/i)) {
-  helper.debugMode = true;
-}
-
-if (process.argv.indexOf('--help') != -1) {
-  showHelp();
-} else if (process.argv.indexOf('--version') != -1) {
-  showVersion();
-} else {
-  try {
-    tasks.runCLI(process.argv.slice(2));
-  } catch (err) {
-    showHelp(err);
-  }
-}
 
 function showHelp(err) {
   var help = ''
     + helper.formatTitle('Usage') + '\n'
     + '  ' + process.title + ' [OPTIONS] [Task] [ARGUMENTS]\n'
     + '\n'
-    + helper.getOptionsHelp({"Options:": [
-        ['--help', null, 'Show this help and exit'],
-        ['--version', null, 'Show version and exit'],
-        ['--no-color', null, 'Disable ANSI color']
-      ]})
+    + helper.getOptionsHelp({"Options:": globalOptions})
     + '\n'
     + helper.colorize('Available tasks:', 'yellow') + '\n'
     + '  Call "' + process.title + ' list"\n';
@@ -61,5 +59,45 @@ function showVersion() {
   } catch (err) {
     helper.logError('Unable to retrieve version: cannot find jus-tasks\'s package.json');
     process.exit(1);
+  }
+}
+
+function removeArg(arg) {
+  args = args.filter(function(a) { return a != arg });
+}
+
+function handleOption(option, description, callback) {
+  globalOptions.push([option, null, description]);
+  // Expects value
+  if (option.match(/=…$/)) { 
+    var value = null;
+    // Search "option <value>"
+    var i = args.indexOf(option.substring(0, option.length-2));
+    if (i != -1) {
+      // Look next value: if none or starts with "-", this is a fail
+      if (typeof args[i+1] == 'undefined' || args[i+1].match(/^-/)) {
+        throw new Error('"' + option + '" expects an argument');
+      }
+      removeArg(args[i]);
+      callback(value);
+    }
+    // Search "option=<value>"
+    else {
+      var eqPrefix = option.substring(0, option.length-1);
+      for (var i=0; i<args.length; i++) {
+        if (args[i].substring(0, option.length-1) == eqPrefix) {
+          removeArg(args[i]);
+          callback(args[i].substring(eqPrefix.length-1));
+        }
+      }
+    }
+  }
+  // Simple flag
+  else {
+    var i = args.indexOf(option);
+    if (i != -1) {
+      removeArg(option);
+      callback();
+    }
   }
 }
