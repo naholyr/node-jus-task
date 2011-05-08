@@ -1,4 +1,4 @@
-const tasks = require('../index');
+const tasks = require('..');
 
 module.exports = new (tasks.Task)({
   "namespace": "task",

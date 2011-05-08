@@ -1,5 +1,5 @@
 const path = require('path');
-const tasks = require('../index');
+const tasks = require('..');
 
 const TEMPLATE = ""
   + "const tasks = require('jus-task');\n"
