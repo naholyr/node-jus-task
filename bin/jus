@@ -21,7 +21,7 @@ try {
   handleOption('--log-level=…', "Disable output for messages below the given log level", setLogLevel);
 
   // Main usage
-  tasks.runCLI(process.argv.slice(2));
+  tasks.runCLI(args);
 
 } catch (err) {
   showHelp(err);
