@@ -1,110 +1,35 @@
 #!/usr/bin/env node
 
 const helper = require('../lib/helper');
-const tasksRepository = require('../index');
+const tasks = require('../index');
 const path = require('path');
+const fs = require('fs');
 
-const VERSION = '1.0.0';
-const APP = path.basename(__filename);
+// Disable colors
+if (process.argv.indexOf('--no-color') != -1) {
+  helper.noColor = true;
+}
 
-const DEBUG = process.env.NODE_DEBUG && process.env.NODE_DEBUG.match(/(true|yes|1)/i);
+if (process.env.NODE_DEBUG && process.env.NODE_DEBUG.match(/(true|yes|1)/i)) {
+  helper.debugMode = true;
+}
 
 if (process.argv.indexOf('--help') != -1) {
   showHelp();
 } else if (process.argv.indexOf('--version') != -1) {
   showVersion();
-}
-
-if (process.argv.indexOf('--no-color') != -1) {
-  helper.noColor = true;
-}
-if (DEBUG) {
-  helper.debugMode = true;
-}
-
-try {
-  main();
-} catch (err) {
-  helper.logError(err);
-  if (DEBUG) {
-    console.log('\n' + helper.formatTitle('Stack trace (debug):'));
-    throw err;
+} else {
+  try {
+    tasks.runCLI(process.argv.slice(2));
+  } catch (err) {
+    showHelp(err);
   }
-  process.exit(1);
 }
 
-function main() {
-  // Browse arguments to extract task
-  var task = null;
-  for (var i=2; i<process.argv.length; i++) {
-    if (!process.argv[i].match(/^-/)) {
-      task = tasksRepository.find(process.argv[i]);
-      break;
-    }
-  }
-  if (!task) { // No argument for a task, or we would have found a task OR thrown an exception
-    showHelp();
-  }
-  // Parse argv and execute task
-  var opts = {}, args = [];
-  (function() {
-    var optionExpectingValue = null, skippedFirstArgument = false;
-    for (var i=2; i<process.argv.length; i++) {
-      var opt = process.argv[i];
-      if (opt.match(/^-/)) { // Short or long option
-        if (optionExpectingValue !== null) {
-          throw new Error('Error at "' + opt + '", previous option "' + optionExpectingValue + '" was expecting an argument');
-        }
-        var optName = opt.substring(1), optVal = undefined;
-        if (opt.match(/^--/)) { // Long option
-          optName = opt.substring(2);
-          var eqPos = opt.indexOf('=');
-          if (eqPos != -1) {
-            optName = opt.substring(2, eqPos);
-            optVal = parseOptValue(opt.substring(eqPos+1));
-          }
-        } else { // Short option
-          if (optName.length > 1) {
-            optName = optName.substring(0, 1);
-            optVal = parseOptValue(optName.substring(1));
-          }
-        }
-        var option = task.getOption(optName);
-        if (!option) {
-          throw new Error('Unexpected "' + opt + '"');
-        }
-        if (option.expectsValue && optVal === undefined) {
-          optionExpectingValue = optName;
-        }
-        opts[optName] = optVal;
-      } else { // Argument
-        if (optionExpectingValue !== null) {
-          opts[optionExpectingValue] = parseOptValue(opt);
-          optionExpectingValue = null;
-        } else {
-          if (!skippedFirstArgument) { // Skip first argument, as it's the task name
-            skippedFirstArgument = true;
-          } else {
-            args.push(parseOptValue(opt));
-          }
-        }
-      }
-    }
-  })();
-  task.execute(opts, args);
-}
-
-function parseOptValue(v) {
-  if (v == 'false') return false;
-  if (v == 'null')  return null;
-  if (v == 'true')  return true;
-  return v;
-}
-
-function showHelp() {
+function showHelp(err) {
   var help = ''
     + helper.formatTitle('Usage') + '\n'
-    + '  ' + APP + ' [OPTIONS] [Task] [ARGUMENTS]\n'
+    + '  ' + process.title + ' [OPTIONS] [Task] [ARGUMENTS]\n'
     + '\n'
     + helper.getOptionsHelp({"Options:": [
         ['--help', null, 'Show this help and exit'],
@@ -113,12 +38,28 @@ function showHelp() {
       ]})
     + '\n'
     + helper.colorize('Available tasks:', 'yellow') + '\n'
-    + '  Call "' + APP + ' list"\n';
-  console.log(help);
-  process.exit(0);
+    + '  Call "' + process.title + ' list"\n';
+  if (err) {
+    helper.logError(err);
+    console.log(help);
+    if (helper.debugMode) {
+      console.log('\n' + helper.formatTitle('Stack trace (debug):'));
+      throw err;
+    }
+    process.exit(1);
+  } else {
+    console.log(help);
+    process.exit(0);
+  }
 }
 
 function showVersion() {
-  helper.log(VERSION);
-  process.exit(0);
+  try {
+    var packageJson = JSON.parse(fs.readFileSync(__dirname + '/../package.json2'));
+    helper.log(packageJson.version);
+    process.exit(0);
+  } catch (err) {
+    helper.logError('Unable to retrieve version: cannot find jus-tasks\'s package.json');
+    process.exit(1);
+  }
 }
