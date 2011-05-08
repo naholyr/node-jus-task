@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const helper = require('../lib/helper');
-const tasks = require('../index');
+const tasks = require('..');
 const path = require('path');
 const fs = require('fs');
 
