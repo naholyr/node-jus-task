@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const tasks = require('..');
 
 const TEMPLATE = ""
@@ -55,5 +56,22 @@ module.exports = new tasks.Task({
       "{{NAMESPACE}}": args.namespace,
       "{{ALIASES}}":   aliases,
     }, TEMPLATE);
+    checkJusTaskDependency();
   }
 });
+
+function checkJusTaskDependency() {
+  if (!path.existsSync('node_modules/jus-task')) {
+    tasks.helper.log('Dependency "jus-task" not found in your project, checking "package.json"…', tasks.helper.level.WARNING);
+    if (!path.existsSync('package.json')) {
+      tasks.helper.log('No "package.json" found: You may create one and add "jus-task" as a dependency, or run "npm install jus-task"', tasks.helper.level.WARNING);
+    } else {
+      var packageJson = JSON.parse(fs.readFileSync('package.json'));
+      if (typeof packageJson.dependencies['jus-task'] == 'undefined') {
+        tasks.helper.log('"package.json" found. You may now add "jus-task" as a dependency and run "npm install"', tasks.helper.level.WARNING);
+      } else {
+        tasks.helper.log('"package.json" found, and properly configured dependency to "jus-task". Maybe you forgot to run "npm install" ?', tasks.helper.level.WARNING);
+      }
+    }
+  }
+}
