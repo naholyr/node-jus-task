@@ -125,3 +125,22 @@ Example equivalent to `jus help list`:
 
     const tasks = require('jus-task')
     tasks.find('help').execute({}, {'task': 'list'})
+
+Why would I use JUS Task ?
+==========================
+
+* It eases the development of CLI tools: just run `jus gen-task my-namespace my-task`, then follow the steps :)
+* It has a souple and robust understanding of the CLI options. I don't like to reinvent the wheel, but I wanted a real parser for options, and all the tested ones (parseopt, nopt, getopt) didn't do the trick. Your users will have a full support of the usual ways to provide values for short/long options:
+  * --foo=value
+  * --foo value
+  * -fvalue
+  * -f value
+* It provides automatic support for some useful common options you wouldn't want to reimplement each time you create such a script :
+  * --debug to enable debug mode (check helper.debugMode in your task)
+  * --log-level to change debug mode (then helper.log() will only display the proper messages)
+  * --help will display full usage of your task + descriptions & co (if you provided some)
+* It abstracts options parsing: just declare your options/arguments, name them, declare alias or whatever, you'll always receive the same expected hashes. Positional arguments become named arguments on your side, and that is cool :)
+
+All these are already good reasons to use it in your project now.
+
+This tool is built to be included in my future framework `jus`, and will be the default way to provide maintenance scripts and so on (like managing server, enabling features, generating modules…).
