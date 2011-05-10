@@ -56,27 +56,39 @@ module.exports = new tasks.Task({
       "{{NAMESPACE}}":        args.namespace,
       "{{ALIASES}}":          aliases,
     }
-    tasks.helper.token(file, tokens, TEMPLATE);
+    tasks.helper.token(file, tokens, TEMPLATE, function() {
+      tasks.helper.log('OK', tasks.helper.level.INFO);
+    });
     hintJusTaskDependency();
   }
 });
 
 function hintJusTaskDependency() {
   // Check local installation
-  if (!path.existsSync(path.join('node_modules', 'jus-task'))) {
-    // module is not found
-    if (!path.existsSync('package.json')) {
-      // no package.json found
-      tasks.helper.log('Failed resolving dependency to jus-task, and no "package.json" found: you should "npm install jus-task" or "npm init" and declare dependency', tasks.helper.level.WARNING);
-    } else {
-      var packageJson = JSON.parse(fs.readFileSync('package.json'));
-      if (typeof packageJson.dependencies['jus-task'] == 'undefined') {
-        // package.json found, but module is not declared as a dependency
-        tasks.helper.log('Failed resolving dependency to jus-task, you should edit your "package.json" and add dependency to "jus-task", then "npm install"', tasks.helper.level.WARNING);
-      } else {
-        // package.json found, and module is declared as a dependency: notice user to npm install ;)
-        tasks.helper.log('Failed resolving dependency to jus-task, but the declaration has been found in your "package.json", maybe you forgot to "npm install" ?', tasks.helper.level.WARNING);
-      }
+  tasks.helper.exists(path.join('node_modules', 'jus-task'), function(err, dirExists) {
+    if (err) throw err;
+    if (!dirExists) {
+      // Module is not found
+      tasks.helper.exists('package.json', function(err, fileExists) {
+        if (err) throw err;
+        if (!fileExists) {
+          // No package.json found
+          tasks.helper.log('Failed resolving dependency to jus-task, and no "package.json" found: you should "npm install jus-task" or "npm init" and declare dependency', tasks.helper.level.WARNING);
+        } else {
+          // Found package.json: check dependency
+          tasks.helper.read('package.json', function(err, content) {
+            if (err) throw err;
+            var packageJson = JSON.parse(content);
+            if (typeof packageJson.dependencies['jus-task'] == 'undefined') {
+              // package.json found, but module is not declared as a dependency
+              tasks.helper.log('Failed resolving dependency to jus-task, you should edit your "package.json" and add dependency to "jus-task", then "npm install"', tasks.helper.level.WARNING);
+            } else {
+              // package.json found, and module is declared as a dependency: notice user to npm install ;)
+              tasks.helper.log('Failed resolving dependency to jus-task, but the declaration has been found in your "package.json", maybe you forgot to "npm install" ?', tasks.helper.level.WARNING);
+            }
+          });
+        }
+      });
     }
-  }
+  });
 }
