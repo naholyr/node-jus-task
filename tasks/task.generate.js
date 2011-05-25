@@ -1,6 +1,6 @@
 const path = require('path');
-const fs = require('fs');
 const tasks = require('..');
+const helper = tasks.helper;
 
 const TEMPLATE = ""
   + "const tasks = require('jus-task');\n"
@@ -56,8 +56,8 @@ module.exports = new tasks.Task({
       "{{NAMESPACE}}":        args.namespace,
       "{{ALIASES}}":          aliases,
     }
-    tasks.helper.token(file, tokens, TEMPLATE, function() {
-      tasks.helper.log('OK', tasks.helper.level.INFO);
+    helper.fs.token(file, tokens, TEMPLATE, function() {
+      helper.log('OK', tasks.helper.level.INFO);
     });
     hintJusTaskDependency();
   }
@@ -65,18 +65,18 @@ module.exports = new tasks.Task({
 
 function hintJusTaskDependency() {
   // Check local installation
-  tasks.helper.exists(path.join('node_modules', 'jus-task'), function(err, dirExists) {
+  helper.fs.exists(path.join('node_modules', 'jus-task'), function(err, dirExists) {
     if (err) throw err;
     if (!dirExists) {
       // Module is not found
-      tasks.helper.exists('package.json', function(err, fileExists) {
+      helper.fs.exists('package.json', function(err, fileExists) {
         if (err) throw err;
         if (!fileExists) {
           // No package.json found
           tasks.helper.log('Failed resolving dependency to jus-task, and no "package.json" found: you should "npm install jus-task" or "npm init" and declare dependency', tasks.helper.level.WARNING);
         } else {
           // Found package.json: check dependency
-          tasks.helper.read('package.json', function(err, content) {
+          helper.fs.read('package.json', function(err, content) {
             if (err) throw err;
             var packageJson = JSON.parse(content);
             if (typeof packageJson.dependencies['jus-task'] == 'undefined') {
