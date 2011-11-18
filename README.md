@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/naholyr/node-jus-task.png)](http://travis-ci.org/naholyr/node-jus-task)
+
 JUS
 ===
 
